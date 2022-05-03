@@ -1,14 +1,20 @@
 {
   "name": "superchat-log",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "author": "Junki Tomatsu <me@junki-t.net>",
+  "repository": "git@github.com:junt1458/superchat-log.git",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint --dir src",
+    "lint:fix": "yarn lint --fix",
+    "format": "prettier --write --ignore-path .gitignore './**/*.{js,jsx,ts,tsx,json}'"
   },
   "dependencies": {
+    "bilibili-live-ws": "^6.2.0",
+    "isomorphic-fetch": "^3.0.0",
     "next": "12.1.6",
     "react": "18.1.0",
     "react-dom": "18.1.0"
@@ -19,6 +25,8 @@
     "@types/react-dom": "18.0.3",
     "eslint": "8.14.0",
     "eslint-config-next": "12.1.6",
+    "eslint-config-prettier": "^8.5.0",
+    "prettier": "^2.6.2",
     "typescript": "4.6.4"
   }
 }
