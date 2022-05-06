@@ -14,13 +14,15 @@
   },
   "dependencies": {
     "bilibili-live-ws": "^6.2.0",
-    "isomorphic-fetch": "^3.0.0",
     "next": "12.1.6",
+    "pako": "^2.0.4",
+    "pinyin": "^2.11.2",
     "react": "18.1.0",
     "react-dom": "18.1.0"
   },
   "devDependencies": {
     "@types/node": "17.0.31",
+    "@types/pinyin": "^2.10.0",
     "@types/react": "18.0.8",
     "@types/react-dom": "18.0.3",
     "eslint": "8.14.0",
