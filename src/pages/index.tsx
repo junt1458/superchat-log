@@ -142,13 +142,21 @@ const Home: NextPage = () => {
     ).slice(-2)}`
   }
 
+  const formatFileDate = (date: Date): string => {
+    return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${(
+      '0' + date.getDate()
+    ).slice(-2)}-${('0' + date.getHours()).slice(-2)}-${('0' + date.getMinutes()).slice(-2)}-${(
+      '0' + date.getSeconds()
+    ).slice(-2)}`
+  }
+
   const onSortChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
     localStorage.setItem('sort', `${e.target.selectedIndex}`)
     setOlder(e.target.selectedIndex === 1)
   }
 
   const onExportClicked = async () => {
-    /*const export_data = confirm(
+    const export_data = confirm(
       '全てのログを出力しますか?\n(キャンセルを選択した場合現在画面に表示されているもののみを出力します。)',
     )
       ? await new Promise<GiftOrSuperChatData[]>((resolve) => {
@@ -162,8 +170,23 @@ const Home: NextPage = () => {
             resolve(list)
             return list
           })
-        })*/
-    alert('準備中...')
+        })
+
+    const res = await fetch('/api/csv', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(export_data),
+    })
+    const csv = await res.text()
+
+    const link = document.createElement('a')
+    link.href = 'data:text/csv;base64;charset=utf-8,' + csv
+    link.download = `投げ銭ログ(${formatFileDate(new Date())}).csv`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
   }
 
   const onFilterChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
