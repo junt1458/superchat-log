@@ -1,16 +1,17 @@
-import { KeepLiveWS } from 'bilibili-live-ws'
+import { KeepLiveWS } from 'bilibili-live-ws/browser'
 import type { NextPage } from 'next'
 import Head from 'next/head'
 import Link from 'next/link'
 import pinyin from 'pinyin'
 import React, { useEffect, useState } from 'react'
 import style from '@/styles/Index.module.css'
+import { calc_price, formatDate, toReadablePinyin } from '@/utils/display'
 
 const Home: NextPage = () => {
   const [live, setLive] = useState<KeepLiveWS | null>(null)
   const [statusMessage, setStatusMessage] = useState('接続操作を行ってください。')
-  const [superChats, setSuperChats] = useState<GiftOrSuperChatData[]>([])
-  const [filtered, setFilteredSuperChats] = useState<GiftOrSuperChatData[]>([])
+  const [superChats, setSuperChats] = useState<ReceiveData[]>([])
+  const [filtered, setFilteredSuperChats] = useState<ReceiveData[]>([])
   const [older, setOlder] = useState(false)
 
   useEffect(() => {
@@ -64,12 +65,8 @@ const Home: NextPage = () => {
 
         // スーパーチャットはこっちで飛んでくる
         l.on('SUPER_CHAT_MESSAGE', (data: ServerData<SuperChat>) => {
-          if (!data.data.time) data.data.time = Math.floor(new Date().getTime() / 1000)
           setSuperChats((list) => {
-            const l = [
-              ...list,
-              { type: 'superchat', data: data, checked: false } as GiftOrSuperChatData,
-            ]
+            const l = [...list, { type: 'superchat', data: data, checked: false } as ReceiveData]
             setFilteredSuperChats(filter(l))
             return l
           })
@@ -80,14 +77,20 @@ const Home: NextPage = () => {
           if (data.data.coin_type === 'gold') {
             if (!data.data.timestamp) data.data.timestamp = Math.floor(new Date().getTime() / 1000)
             setSuperChats((list) => {
-              const l = [
-                ...list,
-                { type: 'gift', data: data, checked: false } as GiftOrSuperChatData,
-              ]
+              const l = [...list, { type: 'gift', data: data, checked: false } as ReceiveData]
               setFilteredSuperChats(filter(l))
               return l
             })
           }
+        })
+
+        // メンバーシップはここ
+        l.on('GUARD_BUY', (data) => {
+          setSuperChats((list) => {
+            const l = [...list, { type: 'membership', data: data, checked: false } as ReceiveData]
+            setFilteredSuperChats(filter(l))
+            return l
+          })
         })
 
         return l
@@ -100,7 +103,7 @@ const Home: NextPage = () => {
     })
   }
 
-  const filter = (list: GiftOrSuperChatData[]): GiftOrSuperChatData[] => {
+  const filter = (list: ReceiveData[]): ReceiveData[] => {
     const mode_div = document.getElementById('filter') as HTMLSelectElement
     if (mode_div == null) return list
 
@@ -123,33 +126,6 @@ const Home: NextPage = () => {
     }
   }
 
-  const calc_price = (data: GiftOrSuperChatData): number => {
-    if (data.type == 'gift') {
-      const d = data.data.data as Gift
-      return d.total_coin / 1000
-    } else if (data.type == 'superchat') {
-      const d = data.data.data as SuperChat
-      return d.price
-    }
-    return -1
-  }
-
-  const formatDate = (date: Date): string => {
-    return `${date.getFullYear()}/${('0' + (date.getMonth() + 1)).slice(-2)}/${(
-      '0' + date.getDate()
-    ).slice(-2)} ${('0' + date.getHours()).slice(-2)}:${('0' + date.getMinutes()).slice(-2)}:${(
-      '0' + date.getSeconds()
-    ).slice(-2)}`
-  }
-
-  const formatFileDate = (date: Date): string => {
-    return `${date.getFullYear()}-${('0' + (date.getMonth() + 1)).slice(-2)}-${(
-      '0' + date.getDate()
-    ).slice(-2)}-${('0' + date.getHours()).slice(-2)}-${('0' + date.getMinutes()).slice(-2)}-${(
-      '0' + date.getSeconds()
-    ).slice(-2)}`
-  }
-
   const onSortChanged = (e: React.ChangeEvent<HTMLSelectElement>) => {
     localStorage.setItem('sort', `${e.target.selectedIndex}`)
     setOlder(e.target.selectedIndex === 1)
@@ -159,13 +135,13 @@ const Home: NextPage = () => {
     const export_data = confirm(
       '全てのログを出力しますか?\n(キャンセルを選択した場合現在画面に表示されているもののみを出力します。)',
     )
-      ? await new Promise<GiftOrSuperChatData[]>((resolve) => {
+      ? await new Promise<ReceiveData[]>((resolve) => {
           setSuperChats((list) => {
             resolve(list)
             return list
           })
         })
-      : await new Promise<GiftOrSuperChatData[]>((resolve) => {
+      : await new Promise<ReceiveData[]>((resolve) => {
           setFilteredSuperChats((list) => {
             resolve(list)
             return list
@@ -183,7 +159,7 @@ const Home: NextPage = () => {
 
     const link = document.createElement('a')
     link.href = 'data:text/csv;base64;charset=utf-8,' + csv
-    link.download = `投げ銭ログ(${formatFileDate(new Date())}).csv`
+    link.download = `投げ銭ログ(${formatDate(new Date(), true)}).csv`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -197,7 +173,7 @@ const Home: NextPage = () => {
     })
   }
 
-  const onCheckChanged = (elem: HTMLInputElement, target: GiftOrSuperChatData) => {
+  const onCheckChanged = (elem: HTMLInputElement, target: ReceiveData) => {
     setSuperChats((list) => {
       const l = [...list]
       const i = l.indexOf(target)
@@ -306,8 +282,16 @@ const Home: NextPage = () => {
                     />
                     <div className={style.userinfo_detail}>
                       <div className={style.userinfo_namedate}>
-                        <div className={style.userinfo_detail_name}>
-                          {data.user_info.uname} ({pinyin(data.user_info.uname)})
+                        <div className={style.userinfo_detail_name}>{data.user_info.uname}</div>
+                        <div className={style.userinfo_detail_pinyin}>
+                          (
+                          {toReadablePinyin(
+                            pinyin(data.user_info.uname, {
+                              segment: true,
+                              group: true,
+                            }),
+                          )}
+                          )
                         </div>
                         <div className={style.userinfo_detail_date}>
                           {formatDate(new Date(data.start_time * 1000))}
@@ -324,7 +308,7 @@ const Home: NextPage = () => {
                   </div>
                 </div>
               )
-            } else {
+            } else if (content.type === 'gift') {
               const data = content.data.data as Gift
               return (
                 <div className={style.card} key={'Gift ' + index}>
@@ -344,8 +328,16 @@ const Home: NextPage = () => {
                     />
                     <div className={style.userinfo_detail}>
                       <div className={style.userinfo_namedate}>
-                        <div className={style.userinfo_detail_name}>
-                          {data.uname} ({pinyin(data.uname)})
+                        <div className={style.userinfo_detail_name}>{data.uname}</div>
+                        <div className={style.userinfo_detail_pinyin}>
+                          (
+                          {toReadablePinyin(
+                            pinyin(data.uname, {
+                              segment: true,
+                              group: true,
+                            }),
+                          )}
+                          )
                         </div>
                         <div className={style.userinfo_detail_date}>
                           {formatDate(new Date(data.timestamp * 1000))}
@@ -357,6 +349,44 @@ const Home: NextPage = () => {
                   <div className={style.content} style={{ backgroundColor: '#368f6e' }}>
                     (ギフト) <br />
                     {data.giftName} x{data.num}
+                  </div>
+                </div>
+              )
+            } else {
+              const data = content.data.data as Membership
+              return (
+                <div className={style.card} key={'Membership ' + index}>
+                  <div className={style.userinfo} style={{ backgroundColor: '#b65bfc' }}>
+                    <div style={{ width: '5px' }}></div>
+                    <input
+                      type='checkbox'
+                      className={style.userinfo_check}
+                      onChange={(e) => onCheckChanged(e.target, content)}
+                      checked={content.checked}
+                    />
+                    <div className={style.userinfo_detail}>
+                      <div className={style.userinfo_namedate}>
+                        <div className={style.userinfo_detail_name}>{data.username}</div>
+                        <div className={style.userinfo_detail_pinyin}>
+                          (
+                          {toReadablePinyin(
+                            pinyin(data.username, {
+                              segment: true,
+                              group: true,
+                            }),
+                          )}
+                          )
+                        </div>
+                        <div className={style.userinfo_detail_date}>
+                          {formatDate(new Date(data.start_time * 1000))}
+                        </div>
+                      </div>
+                      <span className={style.userinfo_amount}>&yen;{calc_price(content)}</span>
+                    </div>
+                  </div>
+                  <div className={style.content} style={{ backgroundColor: '#7e39b3' }}>
+                    (メンバーシップ) <br />
+                    {data.gift_name} x{data.num}
                   </div>
                 </div>
               )

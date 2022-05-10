@@ -4,8 +4,8 @@ type ServerData<T> = {
   roomid: number
 }
 
-type GiftOrSuperChatData = {
-  type: 'gift' | 'superchat'
-  data: ServerData<Gift | SuperChat>
+type ReceiveData = {
+  type: 'gift' | 'superchat' | 'membership'
+  data: ServerData<Gift | SuperChat | Membership>
   checked: boolean
 }
