@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Bilibili Gift Logger</title>
+        <link rel="stylesheet" href="./css/style.css" />
+        <link rel="stylesheet" href="./css/bootstrap.min.css" />
+        <script src="./js/main.js" defer></script>
+        <script src="./js/bootstrap.bundle.min.js" defer></script>
+    </head>
+    <body>
+        <div class="main_contents">
+            <div class="cp">
+                <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top">
+                    <div class="container-fluid">
+                        <span class="navbar-brand">Bilibili Gift Logger</span>
+                        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+                            <span class="navbar-toggler-icon"></span>
+                        </button>
+                        <div class="collapse navbar-collapse justify-content-end" id="navbarText">
+                            <div>
+                                <ul class="navbar-nav me-auto mb-lg-0">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="https://github.com/junt1458/superchat-log" target="_blank" rel="noopener noreferrer">Repository</a>
+                                    </li>
+                                    <li class="nav-item dropdown">
+                                        <a class="nav-link dropdown-toggle active" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            Developer
+                                        </a>
+                                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                            <li><a class="dropdown-item" href="https://twitter.com/junT58" target="_blank" rel="noopener noreferrer">Twitter</a></li>
+                                            <li><a class="dropdown-item" href="https://github.com/junt1458" target="_blank" rel="noopener noreferrer">GitHub</a></li>
+                                        </ul>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link active" href="./license_3rdparty.html" target="_blank" rel="noopener noreferrer">License (3rdparty)</a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </nav>
+                <div class="nav_spacer"></div>
+                <div class="d-flex justify-content-center mb-2">
+                    <div class="text-end pe-1 control_left d-flex align-items-center justify-content-end">
+                        ルームID
+                    </div>
+                    <div class="control_right">
+                        <input
+                            type='number'
+                            id='roomid'
+                            class="control_right form-control"
+                        />
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mb-2">
+                    <button type="button" class="btn btn-primary me-2" id="connect_button">接続</button>
+                    <button type="button" class="btn btn-success" id="csv_button">CSVに出力</button>
+                </div>
+                <div class="d-flex justify-content-center mb-2">
+                    <span id="status">接続操作を行ってください。</span>
+                </div>
+                <div class="d-flex justify-content-center mb-2">
+                    <div class="text-end pe-1 control_left d-flex align-items-center justify-content-end">
+                        表示モード
+                    </div>
+                    <div class="control_right">
+                        <select class="control_right form-select" id="filter">
+                            <option>すべて表示する</option>
+                            <option>未読のみ表示する</option>
+                            <option>30元以上のみ表示する(全て)</option>
+                            <option>30元以上のみ表示する(未読のみ)</option>
+                            <option>99元以上のみ表示する(全て)</option>
+                            <option>99元以上のみ表示する(未読のみ)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="d-flex justify-content-center mb-2">
+                    <div class="text-end pe-1 control_left d-flex align-items-center justify-content-end">
+                        並び変え
+                    </div>
+                    <div class="control_right">
+                        <select class="control_right form-select" id="order">
+                            <option>新しい順</option>
+                            <option>古い順</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="wrapper">
+                <div class="contents_all" id="contents_all">
+                    <!-- Cards -->
+                </div>
+                <div class="contents_separated">
+                    <div class="separated">
+                        <div class="separated_title">
+                            スパチャ
+                        </div>
+                        <div class="separated_wrapper" id="separated_superchat">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+                    <div class="separated">
+                        <div class="separated_title">
+                            ギフト
+                        </div>
+                        <div class="separated_wrapper" id="separated_gift">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+                    <div class="separated">
+                        <div class="separated_title">
+                            メンバー
+                        </div>
+                        <div class="separated_wrapper" id="separated_membership">
+                            <!-- Cards -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

@@ -1,0 +1,28 @@
+{
+    "manifest_version": 3,
+    "name": "Bilibili Gift Logger",
+    "short_name": "B23 SC Logger",
+    "version": "0.0.1",
+    "description": "Gift log viewer for bilibili live",
+    "permissions": [
+        "storage",
+        "contextMenus"
+    ],
+    "host_permissions": [
+        "*://*.bilibili.com/"
+    ],
+    "icons": {
+        "16": "icons/icon@1x.png",
+        "48": "icons/icon@3x.png",
+        "128": "icons/icon@8x.png"
+    },
+    "action": {
+        "default_icon": {
+            "19": "icons/browser@1x.png",
+            "38": "icons/browser@2x.png"
+        }
+    },
+    "background": {
+        "service_worker": "background.js"
+    }
+}
