@@ -56,7 +56,7 @@ function on_checked(id, updated_to, type) {
 
     // Hide from screen (only filter enabled)
     const f = get_filter_val();
-    if(f === 0 || f === 2 || f === 4)
+    if(f === 0 || f === 2 || f === 4 || f === 6)
         return;
 
     const div_a = document.getElementById(id + "_a");
@@ -278,6 +278,12 @@ function match_filter(data) {
         }
         case 5: {
             return !data.checked && price >= 99;
+        }
+        case 6: {
+            return price >= 999;
+        }
+        case 7: {
+            return !data.checked && price >= 999;
         }
         default: {
             return false;
@@ -551,7 +557,7 @@ async function getCommentRoomID (id) {
     if(m2) {
         return parseInt(m2[1]);
     }
-    return -1;
+    return id;
 
 }
 

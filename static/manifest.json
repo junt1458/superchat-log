@@ -2,11 +2,10 @@
     "manifest_version": 3,
     "name": "Bilibili Gift Logger",
     "short_name": "B23 SC Logger",
-    "version": "0.0.1",
-    "description": "Gift log viewer for bilibili live",
+    "version": "1.0.0",
+    "description": "Gift/Superchat/Membership log viewer for bilibili live",
     "permissions": [
-        "storage",
-        "contextMenus"
+        "storage"
     ],
     "host_permissions": [
         "*://*.bilibili.com/"
